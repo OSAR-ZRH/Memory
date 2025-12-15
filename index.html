@@ -6,231 +6,873 @@
 <title>Funk – Memory</title>
 
 <style>
-:root{
-  --bg:#e5edf5;
-  --panel:#fff;
-  --ink:#0f172a;
-  --muted:#64748b;
-  --border:#cbd5e1;
-  --shadow:0 18px 35px rgba(15,23,42,.15);
-  --radius:16px;
-  --ok:#16a34a;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  padding:20px;
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  min-height:100vh;
-}
+  :root{
+    --bg:#e5edf5;
+    --panel:#fff;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --border:#cbd5e1;
+    --shadow:0 18px 35px rgba(15,23,42,.15);
+    --radius:16px;
+    --ok:#16a34a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:20px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+  }
 
-.layout{
-  max-width:1200px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:320px 1fr;
-  gap:14px;
-}
+  .layout{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:14px;
+  }
 
-.panel{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
 
-/* LEFT */
-.leftHead{
-  padding:14px 14px 10px;
-  border-bottom:1px solid #e2e8f0;
-}
-.leftHead h1{margin:0;font-size:1.05rem}
-.leftHead .sub{margin-top:4px;color:var(--muted);font-size:.85rem}
+  /* LEFT */
+  .leftHead{
+    padding:14px 14px 10px;
+    border-bottom:1px solid #e2e8f0;
+  }
+  .leftHead h1{
+    margin:0;
+    font-size:1.05rem;
+  }
+  .leftHead .sub{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:.85rem;
+  }
+  .setList{
+    max-height: calc(100vh - 140px);
+    overflow:auto;
+    padding:8px;
+  }
+  .setItem{
+    width:100%;
+    text-align:left;
+    border:1px solid transparent;
+    background:#f8fafc;
+    border-radius:12px;
+    padding:10px 10px;
+    cursor:pointer;
+    margin-bottom:8px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .setItem:hover{ border-color:#dbe3ee; }
+  .setItem.active{
+    background:#eef2ff;
+    border-color:#c7d2fe;
+  }
+  .setTitle{
+    font-weight:1000;
+    font-size:.95rem;
+    margin:0 0 2px;
+  }
+  .setMeta{
+    color:var(--muted);
+    font-size:.78rem;
+  }
+  .badgeSolved{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-weight:1000;
+    font-size:.78rem;
+    padding:6px 9px;
+    border-radius:999px;
+    border:1px solid rgba(22,163,74,.25);
+    background:#ecfdf5;
+    color:#065f46;
+    white-space:nowrap;
+  }
+  .badgeSolved .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--ok);
+  }
 
-.setList{
-  max-height:calc(100vh - 140px);
-  overflow:auto;
-  padding:8px;
-}
-.setItem{
-  width:100%;
-  border:1px solid transparent;
-  background:#f8fafc;
-  border-radius:12px;
-  padding:10px;
-  cursor:pointer;
-  margin-bottom:8px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-.setItem.active{background:#eef2ff;border-color:#c7d2fe}
+  /* RIGHT */
+  .right{
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-height: calc(100vh - 40px);
+  }
 
-.setTitle{font-weight:1000;font-size:.95rem}
-.setMeta{color:var(--muted);font-size:.78rem}
+  .hintBox{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    padding:12px 14px;
+  }
+  .hintBox .label{
+    font-size:.8rem;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .hintBox .text{
+    font-size:1.0rem;
+    line-height:1.35;
+    font-weight:400;
+  }
 
-.badgeSolved{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  font-weight:1000;
-  font-size:.75rem;
-  padding:6px 9px;
-  border-radius:999px;
-  border:1px solid rgba(22,163,74,.25);
-  background:#ecfdf5;
-  color:#065f46;
-}
-.badgeSolved .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .topRow{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:space-between;
+  }
+  .status{
+    color:var(--muted);
+    font-size:.9rem;
+  }
+  .btn{
+    border:none;
+    border-radius:999px;
+    padding:10px 14px;
+    font-weight:1000;
+    cursor:pointer;
+    background:#0f172a;
+    color:#fff;
+  }
+  .btn.secondary{ background:#334155; }
+  .btn[disabled]{ opacity:.5; cursor:default; }
 
-/* RIGHT */
-.right{
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap:10px;
+    flex:1;
+    min-height:0;
+    align-content:start;
+  }
 
-.hintBox{
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  border-radius:14px;
-  padding:12px 14px;
-}
-.hintBox .label{font-size:.8rem;color:var(--muted)}
-.hintBox .text{font-size:1rem;font-weight:400}
+  /* ✅ QUADRATISCHE KARTEN */
+  .card{
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    background:#ffffff;
+    box-shadow:0 10px 20px rgba(15,23,42,.06);
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+    overflow:hidden;
 
-.topRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.status{color:var(--muted);font-size:.9rem}
+    /* fix square */
+    aspect-ratio: 1 / 1;
+    width:100%;
 
-.btn{
-  border:none;
-  border-radius:999px;
-  padding:10px 14px;
-  font-weight:1000;
-  cursor:pointer;
-  background:#0f172a;
-  color:#fff;
-}
-.btn.secondary{background:#334155}
-.btn[disabled]{opacity:.5;cursor:default}
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px;
+    text-align:center;
+    font-weight:1000;
+    line-height:1.2;
+  }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  flex:1;
-}
+  .cardInner{
+    width:100%;
+    max-width: 100%;
+  }
 
-/* Karten */
-.card{
-  aspect-ratio:1/1;
-  border:1px solid #e2e8f0;
-  border-radius:14px;
-  background:#fff;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  font-weight:1000;
-}
-.card.hidden{
-  background:linear-gradient(135deg,#0f172a,#334155);
-}
-.card.hidden::after{
-  content:"?";
-  color:#fff;
-  font-size:1.6rem;
-}
-.card.matched{
-  background:#ecfdf5;
-  outline:2px solid rgba(22,163,74,.25);
-  opacity:.65;
-  cursor:default;
-}
+  .cardText{
+    font-size: clamp(.85rem, 1.2vw, 1.05rem);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
 
-/* Overlay */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.55);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:50;
-}
-.modal{
-  background:#fff;
-  border-radius:22px;
-  padding:16px;
-  width:min(820px,100%);
-}
-.modalClose{
-  border:none;
-  background:#f1f5f9;
-  border-radius:12px;
-  padding:8px 10px;
-  font-weight:1000;
-  cursor:pointer;
-}
+  .card .small{
+    display:block;
+    font-size:.8rem;
+    color:var(--muted);
+    font-weight:800;
+    margin-top:6px;
+  }
 
-/* Intro */
-#introOverlay{z-index:60}
+  .card.hidden{
+    background:linear-gradient(135deg,#0f172a,#334155);
+    color:transparent;
+  }
+  .card.hidden::after{
+    content:"?";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:1.6rem;
+    opacity:.95;
+    font-weight:1000;
+  }
 
-/* Mobile */
-@media(max-width:980px){
-  .layout{grid-template-columns:1fr}
-  .grid{grid-template-columns:repeat(2,1fr)}
-}
+  .card.revealed{
+    outline:3px solid rgba(37,99,235,.18);
+  }
+
+  .card.matched{
+    cursor:default;
+    opacity:.65;
+    outline:2px solid rgba(22,163,74,.25);
+    background:#ecfdf5;
+  }
+
+  /* RESULT OVERLAY */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:50;
+  }
+  .modal{
+    width:min(860px, 100%);
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    box-shadow:0 25px 60px rgba(15,23,42,.25);
+    padding:16px;
+    position:relative;
+  }
+  .modalHead{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .modalTitle{
+    font-size:1.1rem;
+    font-weight:1000;
+    margin:0;
+  }
+  .modalClose{
+    border:none;
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:8px 10px;
+    cursor:pointer;
+    font-weight:1000;
+  }
+  .resultBox{
+    margin-top:10px;
+    padding:12px 14px;
+    border-radius:16px;
+    border:1px solid rgba(22,163,74,.25);
+    background:#ecfdf5;
+  }
+  .resultLabel{
+    color:#065f46;
+    font-weight:1000;
+    font-size:.85rem;
+    margin-bottom:6px;
+  }
+  .resultText{
+    font-weight:800;
+    font-size:1.05rem;
+    line-height:1.3;
+    white-space:pre-wrap;
+  }
+  .hintInModal{
+    margin-top:10px;
+    padding:12px 14px;
+    border-radius:16px;
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+  }
+  .hintInModal .lbl{
+    color:var(--muted);
+    font-weight:900;
+    font-size:.85rem;
+    margin-bottom:6px;
+  }
+  .hintInModal .txt{
+    font-weight:900;
+    line-height:1.35;
+  }
+  .modalActions{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+
+  /* CONFETTI CANVAS */
+  #confetti{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    pointer-events:none;
+    z-index:55;
+    display:none;
+  }
+
+  @media (max-width: 980px){
+    .layout{ grid-template-columns: 1fr; }
+    .setList{ max-height: 240px; }
+    .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* Untertitel auf Karten ausblenden */
+  .card .small{ display:none; }
+
+  /* =========================
+     INTRO POPUP (NEU)
+     ========================= */
+  #introOverlay{ z-index:60; }
+  .introModal{
+    width:min(760px, 100%);
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    box-shadow:0 25px 60px rgba(15,23,42,.25);
+    padding:16px;
+  }
+  .introHead{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .introTitle{
+    margin:0;
+    font-size:1.1rem;
+    font-weight:1000;
+  }
+  .introSub{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:.92rem;
+    line-height:1.35;
+  }
+  .introList{
+    margin:12px 0 0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:10px;
+  }
+  .introItem{
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+    border-radius:16px;
+    padding:12px 14px;
+  }
+  .introItem b{
+    display:block;
+    font-weight:1000;
+    margin-bottom:4px;
+  }
+  .introActions{
+    margin-top:14px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .btn.ghost{
+    background:#f1f5f9;
+    color:#0f172a;
+    border:1px solid #e2e8f0;
+  }
 </style>
 </head>
-
 <body>
 
-<!-- INTRO -->
+<canvas id="confetti"></canvas>
+
+<div class="layout">
+
+  <!-- LEFT -->
+  <div class="panel">
+    <div class="leftHead">
+      <h1>Memory Sets</h1>
+      <div class="sub">Links siehst du auch, welche Sets schon gelöst wurden ✅</div>
+    </div>
+    <div class="setList" id="setList">
+      <div style="padding:10px;color:var(--muted);">Lade Sets …</div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel right">
+    <div class="hintBox">
+      <div class="label">Szenario</div>
+      <div class="text" id="hintText">Bitte links ein Set auswählen.</div>
+    </div>
+
+    <div class="topRow">
+      <div class="status" id="status">Bereit.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn secondary" id="btnRestart" disabled>Neu mischen</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+</div>
+
+<!-- INTRO POPUP (NEU) -->
 <div class="overlay" id="introOverlay">
-  <div class="modal">
-    <h3>👋 Willkommen beim Funk-Memory</h3>
-    <p>Merke dir die Karten anhand dieser vier Punkte:</p>
-    <ul>
-      <li><b>Sende</b> – Wer spricht?</li>
-      <li><b>Empfänger</b> – An wen?</li>
-      <li><b>Standort</b> – Wo?</li>
-      <li><b>Anweisung / Anfrage</b> – Was?</li>
+  <div class="introModal">
+    <div class="introHead">
+      <div>
+        <p class="introTitle">👋 Willkommen beim Funk-Memory</p>
+        <div class="introSub">
+          Finde zusammengehörige Karten. Achte beim Merken auf diese vier Bausteine:
+        </div>
+      </div>
+      <button class="modalClose" id="btnIntroClose">Schliessen</button>
+    </div>
+
+    <ul class="introList">
+      <li class="introItem">
+        <b>Sende</b>
+        Wer spricht? (z.B. ORION 1)
+      </li>
+      <li class="introItem">
+        <b>Empfänger</b>
+        An wen? (z.B. APRON / TWR)
+      </li>
+      <li class="introItem">
+        <b>Standort</b>
+        Wo bist du? (z.B. „bei Golf“, „Standplatz Axx“)
+      </li>
+      <li class="introItem">
+        <b>Anweisung oder Anfrage</b>
+        Was willst du / was wird verlangt?
+      </li>
     </ul>
-    <button class="modalClose" id="btnIntroClose">Los geht’s</button>
+
+    <div class="introActions">
+      <button class="btn ghost" id="btnIntroDontShow">Nicht mehr anzeigen</button>
+      <button class="btn" id="btnIntroStart">Los geht’s</button>
+    </div>
   </div>
 </div>
 
-<!-- RESULT -->
+<!-- RESULT OVERLAY -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>✅ Memory gelöst</h3>
-    <p id="modalHint">—</p>
-    <button class="modalClose" id="btnClose">Schliessen</button>
+    <div class="modalHead">
+      <div>
+        <p class="modalTitle">✅ Memory gelöst</p>
+      </div>
+      <button class="modalClose" id="btnClose">Schliessen</button>
+    </div>
+
+    <div class="hintInModal">
+      <div class="lbl">Szenario</div>
+      <div class="txt" id="modalHint">—</div>
+    </div>
+
+    <div class="resultBox">
+      <div class="resultLabel">Funkspruch</div>
+      <div class="resultText" id="resultText">—</div>
+    </div>
+
+    <!-- ✅ "Nochmal spielen" entfernt -->
   </div>
 </div>
 
 <script>
 (() => {
+  /***********************
+   * CONFIG (GitHub)
+   ***********************/
+  // ✅ Setze hier deine WebApp-URL ein (endet auf /exec)
+  const API_BASE = "https://script.google.com/macros/s/AKfycbyT_rduRc8HlrGe56C4Ujxv87YWNLdt_miS9280Pdv-MwuMkjR0gPY2A1bbzi-toWis/exec";
 
-const API_BASE = "https://script.google.com/macros/s/AKfycbyT_rduRc8HlrGe56C4Ujxv87YWNLdt_miS9280Pdv-MwuMkjR0gPY2A1bbzi-toWis/exec";
+  // Wenn fetch() wegen CORS blockiert wird, schalten wir automatisch auf JSONP um.
+  const USE_JSONP_FALLBACK = true;
 
-const introOverlay = document.getElementById('introOverlay');
-const btnIntroClose = document.getElementById('btnIntroClose');
-btnIntroClose.onclick = ()=> introOverlay.style.display='none';
+  const setListEl  = document.getElementById('setList');
+  const hintTextEl = document.getElementById('hintText');
+  const gridEl     = document.getElementById('grid');
+  const statusEl   = document.getElementById('status');
+  const btnRestart = document.getElementById('btnRestart');
 
-window.addEventListener('load', ()=>{
-  introOverlay.style.display='flex';
-});
+  const overlay      = document.getElementById('overlay');
+  const resultTextEl = document.getElementById('resultText');
+  const modalHintEl  = document.getElementById('modalHint');
+  const btnClose     = document.getElementById('btnClose');
+
+  // ✅ Intro elements
+  const introOverlay  = document.getElementById('introOverlay');
+  const btnIntroClose = document.getElementById('btnIntroClose');
+  const btnIntroStart = document.getElementById('btnIntroStart');
+  const btnIntroDont  = document.getElementById('btnIntroDontShow');
+
+  // confetti
+  const confettiCanvas = document.getElementById('confetti');
+  const cctx = confettiCanvas.getContext('2d');
+
+  let sets = [];
+  let selectedSet = null;
+
+  let cards = [];
+  let state = [];
+  let firstPick = null;
+  let lock = false;
+  let matchedPairs = new Set();
+
+  // solved tracking (localStorage)
+  const SOLVED_KEY = 'funk_memory_solved_v1';
+  function loadSolvedMap(){
+    try { return JSON.parse(localStorage.getItem(SOLVED_KEY) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function saveSolvedMap(map){
+    try { localStorage.setItem(SOLVED_KEY, JSON.stringify(map)); } catch(e){}
+  }
+  function markSolved(setId){
+    const m = loadSolvedMap();
+    m[String(setId)] = true;
+    saveSolvedMap(m);
+  }
+  function isSolved(setId){
+    const m = loadSolvedMap();
+    return !!m[String(setId)];
+  }
+
+  function shuffle(a){
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function escapeHtml(s){
+    return String(s || '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  function renderSetList(){
+    setListEl.innerHTML = '';
+    sets.forEach(s => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'setItem' + (selectedSet && selectedSet.setId === s.setId ? ' active' : '');
+      btn.innerHTML = `
+        <div>
+          <div class="setTitle">${escapeHtml(s.setId)}</div>
+          <div class="setMeta">${s.countPairs} Paare</div>
+        </div>
+        ${isSolved(s.setId) ? `<div class="badgeSolved"><span class="dot"></span> GELÖST</div>` : ``}
+      `;
+      btn.addEventListener('click', ()=> selectSet(s.setId));
+      setListEl.appendChild(btn);
+    });
+  }
+
+  function selectSet(setId){
+    selectedSet = sets.find(s => s.setId === setId) || null;
+    renderSetList();
+
+    hintTextEl.textContent = selectedSet?.hint || '—';
+    btnRestart.disabled = false;
+
+    startGame();
+  }
+
+  function startGame(){
+    if (!selectedSet) return;
+
+    matchedPairs = new Set();
+    firstPick = null;
+    lock = false;
+
+    cards = shuffle([ ...selectedSet.cards ].map(c => ({...c})));
+    state = cards.map(()=> ({ revealed:false, matched:false }));
+
+    overlay.style.display = 'none';
+    resultTextEl.textContent = selectedSet.result || '—';
+    modalHintEl.textContent  = selectedSet.hint || '—';
+
+    renderGrid();
+    updateStatus();
+  }
+
+  function updateStatus(){
+    if (!selectedSet) { statusEl.textContent = 'Bereit.'; return; }
+    statusEl.textContent = `Paare gefunden: ${matchedPairs.size} / ${selectedSet.countPairs}`;
+  }
+
+  function renderGrid(){
+    gridEl.innerHTML = '';
+    cards.forEach((c, i) => {
+      const st = state[i];
+      const div = document.createElement('div');
+
+      let cls = 'card hidden';
+      if (st.revealed) cls = 'card revealed';
+      if (st.matched)  cls = 'card matched';
+      div.className = cls;
+
+      if (!st.revealed && !st.matched) {
+        div.innerHTML = '';
+      } else {
+        div.innerHTML = `
+          <div class="cardInner">
+            <div class="cardText">${escapeHtml(c.text)}</div>
+            ${c.role ? `<span class="small">${escapeHtml(c.role)}</span>` : ''}
+          </div>
+        `;
+      }
+
+      div.addEventListener('click', ()=> onCardClick(i));
+      gridEl.appendChild(div);
+    });
+  }
+
+  function onCardClick(i){
+    if (!selectedSet) return;
+    if (lock) return;
+    if (state[i].matched) return;
+
+    state[i].revealed = true;
+    renderGrid();
+
+    if (firstPick === null) { firstPick = i; return; }
+    if (firstPick === i) return;
+
+    const a = cards[firstPick];
+    const b = cards[i];
+    const isMatch = (a.pairId === b.pairId);
+
+    if (isMatch) {
+      state[firstPick].matched = true;
+      state[i].matched = true;
+
+      matchedPairs.add(a.pairId);
+
+      firstPick = null;
+      renderGrid();
+      updateStatus();
+
+      if (matchedPairs.size === selectedSet.countPairs) {
+        showSolved();
+      }
+      return;
+    }
+
+    lock = true;
+    setTimeout(()=> {
+      state[firstPick].revealed = false;
+      state[i].revealed = false;
+      firstPick = null;
+      lock = false;
+      renderGrid();
+    }, 650);
+  }
+
+  function showSolved(){
+    markSolved(selectedSet.setId);
+    renderSetList();
+
+    resultTextEl.textContent = selectedSet?.result || '—';
+    modalHintEl.textContent  = selectedSet?.hint || '—';
+
+    fireConfetti(1400);
+    overlay.style.display = 'flex';
+  }
+
+  btnRestart.addEventListener('click', (e)=>{
+    e.preventDefault();
+    startGame();
+  });
+
+  btnClose.addEventListener('click', ()=> overlay.style.display = 'none');
+
+  // ✅ Klick ausserhalb schliesst Ergebnis-Popup
+  overlay.addEventListener('click', (e)=>{
+    if (e.target === overlay) overlay.style.display = 'none';
+  });
+
+  // ---------------------------
+  // CONFETTI (lightweight)
+  // ---------------------------
+  function resizeConfetti(){
+    confettiCanvas.width  = Math.floor(window.innerWidth * devicePixelRatio);
+    confettiCanvas.height = Math.floor(window.innerHeight * devicePixelRatio);
+    cctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener('resize', resizeConfetti);
+
+  function fireConfetti(durationMs){
+    resizeConfetti();
+    confettiCanvas.style.display = 'block';
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    const pieces = [];
+    const n = 160;
+    const end = performance.now() + durationMs;
+
+    for (let i=0;i<n;i++){
+      pieces.push({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*0.2,
+        w: 6 + Math.random()*6,
+        h: 10 + Math.random()*10,
+        vx: -2 + Math.random()*4,
+        vy: 2 + Math.random()*5,
+        rot: Math.random()*Math.PI,
+        vr: -0.15 + Math.random()*0.3,
+        col: `hsl(${Math.floor(Math.random()*360)}, 85%, 55%)`,
+        alpha: 0.9
+      });
+    }
+
+    function tick(t){
+      cctx.clearRect(0,0,W,H);
+
+      pieces.forEach(p=>{
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.03;
+        p.vx *= 0.995;
+        p.rot += p.vr;
+
+        const left = end - t;
+        if (left < 350) p.alpha = Math.max(0, left / 350);
+
+        cctx.save();
+        cctx.translate(p.x, p.y);
+        cctx.rotate(p.rot);
+        cctx.globalAlpha = p.alpha;
+        cctx.fillStyle = p.col;
+        cctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        cctx.restore();
+      });
+
+      for (let i=pieces.length-1;i>=0;i--){
+        if (pieces[i].y > H + 50 || pieces[i].alpha <= 0) pieces.splice(i,1);
+      }
+
+      if (t < end && pieces.length){
+        requestAnimationFrame(tick);
+      } else {
+        cctx.clearRect(0,0,W,H);
+        confettiCanvas.style.display = 'none';
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // ---------------------------
+  // LOAD sets from Apps Script API
+  // ---------------------------
+  function setError(msg){
+    setListEl.innerHTML = `<div style="padding:10px;color:var(--muted);">${escapeHtml(msg)}</div>`;
+  }
+
+  function loadSets(res){
+    sets = res || [];
+    if (!sets.length) {
+      setError('Keine aktiven Memory-Einträge gefunden.');
+      return;
+    }
+    renderSetList();
+    selectSet(sets[0].setId);
+  }
+
+  async function loadViaFetch(){
+    const url = `${API_BASE}?action=memory`;
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  function loadViaJsonp(){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      window[cb] = (data) => { delete window[cb]; script.remove(); resolve(data); };
+
+      const script = document.createElement('script');
+      script.src = `${API_BASE}?action=memory&callback=${cb}`;
+      script.onerror = () => { delete window[cb]; script.remove(); reject(new Error('JSONP load failed')); };
+      document.head.appendChild(script);
+    });
+  }
+
+  // ---------------------------
+  // INTRO POPUP LOGIK (NEU)
+  // ---------------------------
+  const INTRO_KEY = 'funk_memory_intro_hidden_v1';
+  function introHidden(){ return localStorage.getItem(INTRO_KEY) === '1'; }
+  function hideIntro(){ introOverlay.style.display = 'none'; }
+  function showIntro(){ introOverlay.style.display = 'flex'; }
+
+  btnIntroClose?.addEventListener('click', hideIntro);
+  btnIntroStart?.addEventListener('click', hideIntro);
+  btnIntroDont?.addEventListener('click', ()=>{
+    try{ localStorage.setItem(INTRO_KEY, '1'); }catch(e){}
+    hideIntro();
+  });
+  introOverlay?.addEventListener('click', (e)=>{
+    if (e.target === introOverlay) hideIntro();
+  });
+
+  (async ()=>{
+    try{
+      setError('Lade Sets …');
+      const data = await loadViaFetch();
+      loadSets(data);
+
+      if (!introHidden()) showIntro();
+
+    }catch(err){
+      console.error(err);
+      if (USE_JSONP_FALLBACK){
+        try{
+          const data = await loadViaJsonp();
+          loadSets(data);
+
+          if (!introHidden()) showIntro();
+
+        }catch(err2){
+          console.error(err2);
+          setError('Fehler beim Laden der Memory-Daten.');
+        }
+      } else {
+        setError('Fehler beim Laden der Memory-Daten.');
+      }
+    }
+  })();
 
 })();
 </script>
