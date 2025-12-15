@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Funk – Memory</title>
+
 <style>
   :root{
     --bg:#e5edf5;
@@ -162,8 +163,10 @@
     gap:10px;
     flex:1;
     min-height:0;
+    align-content:start;
   }
 
+  /* ✅ QUADRATISCHE KARTEN */
   .card{
     border:1px solid #e2e8f0;
     border-radius:14px;
@@ -173,7 +176,11 @@
     user-select:none;
     position:relative;
     overflow:hidden;
-    min-height:92px;
+
+    /* fix square */
+    aspect-ratio: 1 / 1;
+    width:100%;
+
     display:flex;
     align-items:center;
     justify-content:center;
@@ -181,6 +188,17 @@
     text-align:center;
     font-weight:1000;
     line-height:1.2;
+  }
+
+  .cardInner{
+    width:100%;
+    max-width: 100%;
+  }
+
+  .cardText{
+    font-size: clamp(.85rem, 1.2vw, 1.05rem);
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .card .small{
@@ -385,16 +403,25 @@
 
 <script>
 (() => {
+  /***********************
+   * CONFIG (GitHub)
+   ***********************/
+  // ✅ Setze hier deine WebApp-URL ein (endet auf /exec)
+  const API_BASE = "https://script.google.com/macros/s/AKfycbyT_rduRc8HlrGe56C4Ujxv87YWNLdt_miS9280Pdv-MwuMkjR0gPY2A1bbzi-toWis/exec";
+
+  // Wenn fetch() wegen CORS blockiert wird, schalten wir automatisch auf JSONP um.
+  const USE_JSONP_FALLBACK = true;
+
   const setListEl  = document.getElementById('setList');
   const hintTextEl = document.getElementById('hintText');
   const gridEl     = document.getElementById('grid');
   const statusEl   = document.getElementById('status');
   const btnRestart = document.getElementById('btnRestart');
 
-  const overlay    = document.getElementById('overlay');
-  const resultText = document.getElementById('resultText');
-  const modalHint  = document.getElementById('modalHint');
-  const btnClose   = document.getElementById('btnClose');
+  const overlay      = document.getElementById('overlay');
+  const resultTextEl = document.getElementById('resultText');
+  const modalHintEl  = document.getElementById('modalHint');
+  const btnClose     = document.getElementById('btnClose');
   const btnPlayAgain = document.getElementById('btnPlayAgain');
 
   // confetti
@@ -447,8 +474,6 @@
   }
 
   function renderSetList(){
-    const solvedCount = sets.filter(s => isSolved(s.setId)).length;
-
     setListEl.innerHTML = '';
     sets.forEach(s => {
       const btn = document.createElement('button');
@@ -464,9 +489,6 @@
       btn.addEventListener('click', ()=> selectSet(s.setId));
       setListEl.appendChild(btn);
     });
-
-    // optional: kleine headline im sub-Text
-    // (lassen wir minimal – du siehst ja die badges)
   }
 
   function selectSet(setId){
@@ -490,8 +512,8 @@
     state = cards.map(()=> ({ revealed:false, matched:false }));
 
     overlay.style.display = 'none';
-    resultText.textContent = selectedSet.result || '—';
-    modalHint.textContent = selectedSet.hint || '—';
+    resultTextEl.textContent = selectedSet.result || '—';
+    modalHintEl.textContent  = selectedSet.hint || '—';
 
     renderGrid();
     updateStatus();
@@ -517,8 +539,8 @@
         div.innerHTML = '';
       } else {
         div.innerHTML = `
-          <div>
-            <div>${escapeHtml(c.text)}</div>
+          <div class="cardInner">
+            <div class="cardText">${escapeHtml(c.text)}</div>
             ${c.role ? `<span class="small">${escapeHtml(c.role)}</span>` : ''}
           </div>
         `;
@@ -571,18 +593,13 @@
   }
 
   function showSolved(){
-    // solved marker
     markSolved(selectedSet.setId);
     renderSetList();
 
-    // set modal content
-    resultText.textContent = selectedSet?.result || '—';
-    modalHint.textContent  = selectedSet?.hint || '—';
+    resultTextEl.textContent = selectedSet?.result || '—';
+    modalHintEl.textContent  = selectedSet?.hint || '—';
 
-    // confetti
     fireConfetti(1400);
-
-    // show overlay
     overlay.style.display = 'flex';
   }
 
@@ -616,8 +633,7 @@
 
     const pieces = [];
     const n = 160;
-    const now = performance.now();
-    const end = now + durationMs;
+    const end = performance.now() + durationMs;
 
     for (let i=0;i<n;i++){
       pieces.push({
@@ -629,7 +645,6 @@
         vy: 2 + Math.random()*5,
         rot: Math.random()*Math.PI,
         vr: -0.15 + Math.random()*0.3,
-        // random bright-ish color
         col: `hsl(${Math.floor(Math.random()*360)}, 85%, 55%)`,
         alpha: 0.9
       });
@@ -641,11 +656,10 @@
       pieces.forEach(p=>{
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.03;       // gravity
+        p.vy += 0.03;
         p.vx *= 0.995;
         p.rot += p.vr;
 
-        // fade near end
         const left = end - t;
         if (left < 350) p.alpha = Math.max(0, left / 350);
 
@@ -658,7 +672,6 @@
         cctx.restore();
       });
 
-      // remove offscreen
       for (let i=pieces.length-1;i>=0;i--){
         if (pieces[i].y > H + 50 || pieces[i].alpha <= 0) pieces.splice(i,1);
       }
@@ -674,22 +687,62 @@
     requestAnimationFrame(tick);
   }
 
-  // LOAD sets from backend
-  google.script.run
-    .withSuccessHandler((res)=>{
-      sets = res || [];
-      if (!sets.length) {
-        setListEl.innerHTML = '<div style="padding:10px;color:var(--muted);">Keine aktiven Memory-Einträge gefunden.</div>';
-        return;
-      }
-      renderSetList();
-      selectSet(sets[0].setId);
-    })
-    .withFailureHandler((err)=>{
+  // ---------------------------
+  // LOAD sets from Apps Script API
+  // ---------------------------
+  function setError(msg){
+    setListEl.innerHTML = `<div style="padding:10px;color:var(--muted);">${escapeHtml(msg)}</div>`;
+  }
+
+  function loadSets(res){
+    sets = res || [];
+    if (!sets.length) {
+      setError('Keine aktiven Memory-Einträge gefunden.');
+      return;
+    }
+    renderSetList();
+    selectSet(sets[0].setId);
+  }
+
+  async function loadViaFetch(){
+    const url = `${API_BASE}?action=memory`;
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  function loadViaJsonp(){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      window[cb] = (data) => { delete window[cb]; script.remove(); resolve(data); };
+
+      const script = document.createElement('script');
+      script.src = `${API_BASE}?action=memory&callback=${cb}`;
+      script.onerror = () => { delete window[cb]; script.remove(); reject(new Error('JSONP load failed')); };
+      document.head.appendChild(script);
+    });
+  }
+
+  (async ()=>{
+    try{
+      setError('Lade Sets …');
+      const data = await loadViaFetch();
+      loadSets(data);
+    }catch(err){
       console.error(err);
-      setListEl.innerHTML = '<div style="padding:10px;color:var(--muted);">Fehler beim Laden der Memory-Daten.</div>';
-    })
-    .getMemorySets();
+      if (USE_JSONP_FALLBACK){
+        try{
+          const data = await loadViaJsonp();
+          loadSets(data);
+        }catch(err2){
+          console.error(err2);
+          setError('Fehler beim Laden der Memory-Daten.');
+        }
+      } else {
+        setError('Fehler beim Laden der Memory-Daten.');
+      }
+    }
+  })();
 
 })();
 </script>
